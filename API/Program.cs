@@ -30,5 +30,16 @@ app.UseAuthorization();
 app.MapControllers();
 
 using var scope = app.Services.CreateScope();//garbage collector using 쓰는 이유는 사용이후 메모리 회수하기때문에
+var services = scope.ServiceProvider;
 
+try
+{
+    var context = services.GetRequiredService<DataContext>();
+    context.Database.Migrate();
+}
+catch (System.Exception ex)
+{
+    var logger =services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occured during migration.");
+}
 app.Run();
